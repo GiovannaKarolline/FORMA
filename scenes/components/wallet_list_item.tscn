@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://bvqvu0qrjfo24"]
+
+[ext_resource type="Script" uid="uid://dpqpokpxc20yb" path="res://scripts/components/wallet_list_item.gd" id="1_1l6u6"]
+
+[node name="WalletListItem" type="Button" unique_id=1154164892]
+script = ExtResource("1_1l6u6")
