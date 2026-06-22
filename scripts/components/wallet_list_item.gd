@@ -24,19 +24,26 @@ func _ready() -> void:
 
 func setup(asset_data: Dictionary) -> void:
 	_data   = asset_data
-	_ticker = asset_data.get("ticker", "")
+	_ticker = str(asset_data.get("ticker", ""))
 
 	ticker_label.text = _ticker
 	name_label.text   = str(asset_data.get("nome", ""))
-	price_label.text  = "R$ %.2f" % asset_data.get("preco", 0.0)
+
+	var preco: float = asset_data.get("preco", -1.0)
+	price_label.text = "R$ %.2f" % preco if preco >= 0.0 else "–"
 
 	var variacao: float = asset_data.get("variacao_pct", 0.0)
-	var sinal           := "+" if variacao >= 0.0 else ""
-	variation_label.text = "%s%.2f%%" % [sinal, variacao]
-	variation_label.add_theme_color_override(
-		"font_color",
-		FormaTokens.GREEN if variacao >= 0.0 else FormaTokens.RED
-	)
+	if preco < 0.0:
+		variation_label.text = "–"
+		variation_label.add_theme_color_override("font_color", FormaTokens.N400)
+	else:
+		var sinal := "+" if variacao >= 0.0 else ""
+		variation_label.text = "%s%.2f%%" % [sinal, variacao]
+		variation_label.add_theme_color_override(
+			"font_color",
+			FormaTokens.GREEN if variacao >= 0.0 else FormaTokens.RED
+		)
+
 	_refresh_visual_state()
 
 func matches_query(query: String) -> bool:
@@ -74,3 +81,6 @@ func _refresh_visual_state() -> void:
 		check_indicator.texture = _icon_unchecked
 
 	modulate = Color(1.0, 1.0, 1.0, 0.45 if disabled else 1.0)
+
+func get_ticker() -> String:
+	return _ticker

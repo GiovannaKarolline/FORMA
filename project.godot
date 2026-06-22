@@ -18,8 +18,10 @@ config/icon="res://icon.svg"
 [autoload]
 
 FormaTokens="*uid://cvvvql2niykwn"
-SelectionManager="*uid://ccgkkltduiuqj"
+WalletApiClient="*uid://dpj1rjrj3ykid"
+AppSession="*uid://cc6kytvuaulx1"
 WalletRepository="*uid://43aimqhyh4a4"
+SelectionManager="*uid://ccgkkltduiuqj"
 
 [display]
 

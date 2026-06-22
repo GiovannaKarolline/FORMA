@@ -1,38 +1,24 @@
 [gd_scene load_steps=9 format=3]
 
-[ext_resource type="Script" path="res://scripts/components/suggested_portfolio_chip.gd" id="1"]
-[ext_resource type="FontFile" path="res://assets/fonts/SpaceGrotesk-Bold.ttf" id="2"]
-[ext_resource type="FontFile" path="res://assets/fonts/SpaceGrotesk-Regular.ttf" id="3"]
+[ext_resource type="Script"   path="res://scripts/components/suggested_portfolio_chip.gd" id="1"]
+[ext_resource type="FontFile" path="res://assets/fonts/SpaceGrotesk-Bold.ttf"             id="2"]
+[ext_resource type="FontFile" path="res://assets/fonts/SpaceGrotesk-Regular.ttf"          id="3"]
+[ext_resource type="FontFile" path="res://assets/fonts/SpaceMono-Regular.ttf"             id="4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
-bg_color = Color(1, 1, 1, 1)
-border_color = Color(0.925, 0.918, 0.902, 1)
+bg_color = Color(0.051, 0.051, 0.082, 1)
+border_color = Color(0.941, 0.788, 0.227, 1)
+border_width_top = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
+draw_center = false
+border_color = Color(0.184, 0.180, 0.220, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-shadow_color = Color(0.051, 0.051, 0.082, 0.07)
-shadow_size = 4
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_2"]
-bg_color = Color(0.051, 0.051, 0.082, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-content_margin_left = 16.0
-content_margin_right = 16.0
-content_margin_top = 0.0
-content_margin_bottom = 0.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_3"]
-bg_color = Color(0.106, 0.247, 0.627, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
-content_margin_left = 16.0
-content_margin_right = 16.0
+content_margin_left = 10.0
+content_margin_right = 10.0
 content_margin_top = 0.0
 content_margin_bottom = 0.0
 
@@ -42,9 +28,11 @@ base_font = ExtResource("2")
 [sub_resource type="FontVariation" id="FontVariation_2"]
 base_font = ExtResource("3")
 
+[sub_resource type="FontVariation" id="FontVariation_3"]
+base_font = ExtResource("4")
+
 [node name="SuggestedPortfolioChip" type="PanelContainer"]
-custom_minimum_size = Vector2(240, 0)
-size_flags_vertical = 4
+custom_minimum_size = Vector2(172, 160)
 script = ExtResource("1")
 theme_override_styles/panel = SubResource("StyleBoxFlat_1")
 
@@ -57,36 +45,46 @@ theme_override_constants/margin_bottom = 16
 
 [node name="ContentBox" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
+
+[node name="CategoryTagLabel" type="Label" parent="MarginContainer/ContentBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_fonts/font = SubResource("FontVariation_3")
+theme_override_font_sizes/font_size = 8
+theme_override_colors/font_color = Color(0.941, 0.788, 0.227, 1)
+text = "TAG"
 
 [node name="PortfolioNameLabel" type="Label" parent="MarginContainer/ContentBox"]
 unique_name_in_owner = true
 layout_mode = 2
+autowrap_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_1")
-theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.051, 0.051, 0.082, 1)
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.973, 0.965, 0.945, 1)
 text = "Carteira"
 
 [node name="PortfolioDescriptionLabel" type="Label" parent="MarginContainer/ContentBox"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
 autowrap_mode = 2
 theme_override_fonts/font = SubResource("FontVariation_2")
-theme_override_font_sizes/font_size = 12
+theme_override_font_sizes/font_size = 11
 theme_override_colors/font_color = Color(0.384, 0.380, 0.447, 1)
-text = "Descrição da carteira"
+text = "Descrição"
 
 [node name="ApplyButton" type="Button" parent="MarginContainer/ContentBox"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 32)
+alignment = 0
 text = "Usar esta carteira"
 theme_override_styles/normal = SubResource("StyleBoxFlat_2")
-theme_override_styles/hover = SubResource("StyleBoxFlat_3")
-theme_override_styles/pressed = SubResource("StyleBoxFlat_3")
+theme_override_styles/hover = SubResource("StyleBoxFlat_2")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_2")
 theme_override_styles/focus = SubResource("StyleBoxFlat_2")
 theme_override_colors/font_color = Color(0.973, 0.965, 0.945, 1)
 theme_override_colors/font_hover_color = Color(0.973, 0.965, 0.945, 1)
-theme_override_colors/font_pressed_color = Color(0.973, 0.965, 0.945, 1)
 theme_override_fonts/font = SubResource("FontVariation_1")
-theme_override_font_sizes/font_size = 13
+theme_override_font_sizes/font_size = 11

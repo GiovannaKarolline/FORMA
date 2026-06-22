@@ -1,0 +1,88 @@
+extends Node
+
+const BASE_USER  := "http://20.195.170.160:8081"
+const BASE_ASSET := "http://20.195.170.160:8082"
+const BASE_PORTF := "http://20.195.170.160:8083"
+const BASE_NOTIF := "http://20.195.170.160:8084"
+
+const _HEADERS := ["Content-Type: application/json", "Accept: application/json"]
+
+# Retorna: { "ok": bool, "code": int, "data": Variant }
+func _req(url: String, method: int = HTTPClient.METHOD_GET, body: String = "") -> Dictionary:
+	var http := HTTPRequest.new()
+	get_tree().root.add_child(http)
+
+	var err := http.request(url, _HEADERS, method, body)
+	if err != OK:
+		http.queue_free()
+		push_error("[API] Falha ao iniciar requisição para %s — erro %d" % [url, err])
+		return {"ok": false, "code": -1, "data": null}
+
+	var result: Array = await http.request_completed
+	http.queue_free()
+
+	var code: int             = result[1]
+	var raw: String           = (result[3] as PackedByteArray).get_string_from_utf8()
+	var data: Variant         = JSON.parse_string(raw) if raw.length() > 2 else null
+	var ok: bool              = code >= 200 and code < 300
+
+	if not ok:
+		push_warning("[API] %s → HTTP %d: %s" % [url, code, raw.left(200)])
+
+	return {"ok": ok, "code": code, "data": data}
+
+func register_user(name: String, email: String, password: String,
+		risk_profile: String = "MODERADO") -> Dictionary:
+	var body := JSON.stringify({
+		"name": name, "email": email,
+		"password": password, "riskProfile": risk_profile
+	})
+	return await _req(BASE_USER + "/api/users/register", HTTPClient.METHOD_POST, body)
+
+func get_user(user_id: int) -> Dictionary:
+	return await _req(BASE_USER + "/api/users/%d" % user_id)
+
+func update_risk_profile(user_id: int, profile: String) -> Dictionary:
+	return await _req(
+		BASE_USER + "/api/users/%d/risk-profile" % user_id,
+		HTTPClient.METHOD_PUT,
+		JSON.stringify(profile)
+	)
+
+
+func get_all_assets() -> Dictionary:
+	return await _req(BASE_ASSET + "/api/assets")
+
+func get_asset(ticker: String) -> Dictionary:
+	return await _req(BASE_ASSET + "/api/assets/%s" % ticker)
+
+func get_asset_stats(ticker: String) -> Dictionary:
+	# Retorna: { "ticker", "expectedReturn" (μ), "risk" (σ), "priceCount" }
+	return await _req(BASE_ASSET + "/api/assets/%s/stats" % ticker)
+
+
+func create_portfolio(user_id: int, name: String, tickers: Array,
+		goal: String = "MAX_SHARPE") -> Dictionary:
+	var body := JSON.stringify({
+		"userId":           user_id,
+		"name":             name,
+		"tickers":          tickers,
+		"optimizationGoal": goal
+	})
+	return await _req(BASE_PORTF + "/api/portfolios", HTTPClient.METHOD_POST, body)
+
+func optimize_portfolio(portfolio_id: int) -> Dictionary:
+	return await _req(
+		BASE_PORTF + "/api/portfolios/%d/optimize" % portfolio_id,
+		HTTPClient.METHOD_POST
+	)
+
+func get_portfolio(portfolio_id: int) -> Dictionary:
+	return await _req(BASE_PORTF + "/api/portfolios/%d" % portfolio_id)
+
+func get_user_portfolios(user_id: int) -> Dictionary:
+	return await _req(BASE_PORTF + "/api/portfolios/user/%d" % user_id)
+
+
+func get_notifications(user_id: int) -> Dictionary:
+	return await _req(BASE_NOTIF + "/api/notifications/user/%d" % user_id)
