@@ -13,6 +13,7 @@ extends VBoxContainer
 @onready var bottom_progress:    ProgressBar     = %BottomProgressBar
 @onready var clear_button:       Button          = %ClearSelectionButton
 @onready var continue_button:    Button          = %ContinueButton
+@onready var more_button:        Button          = %MoreButton
 
 const CATEGORY_SECTION_SCENE := preload("res://scenes/components/category_section.tscn")
 const SUGGESTED_CHIP_SCENE   := preload("res://scenes/components/suggested_portfolio_chip.tscn")
@@ -45,6 +46,7 @@ func _ready() -> void:
 	SelectionManager.selection_limit_reached.connect(_on_limit_reached)
 	clear_button.pressed.connect(SelectionManager.clear)
 	continue_button.pressed.connect(_on_continue_pressed)
+	more_button.pressed.connect(_on_notifications_pressed)
 
 	await _load_categories()
 	_load_suggested_portfolios()
@@ -281,6 +283,9 @@ func _on_selection_changed(_selected: Array, count: int) -> void:
 
 func _on_limit_reached() -> void:
 	push_warning("Limite de 10 ativos atingido.")
+
+func _on_notifications_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/screens/notifications_screen.tscn")
 
 func _update_responsive_layout() -> void:
 	var w := get_tree().root.size.x

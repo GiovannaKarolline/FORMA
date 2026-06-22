@@ -6,6 +6,7 @@
 [ext_resource type="FontFile" uid="uid://bbhmar6e4jb37" path="res://assets/fonts/SpaceMono-Regular.ttf" id="4"]
 [ext_resource type="Texture2D" uid="uid://omgw44yrr3yo" path="res://assets/icons/arrow_left.svg" id="5"]
 [ext_resource type="Texture2D" uid="uid://qniledqr3v1b" path="res://assets/icons/more_horiz.svg" id="6"]
+[ext_resource type="Texture2D" path="res://assets/icons/notifications.svg" id="7"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
 bg_color = Color(0.973, 0.965, 0.945, 1)
@@ -212,6 +213,7 @@ text = "Montar Carteira"
 horizontal_alignment = 1
 
 [node name="MoreButton" type="Button" parent="TopAppBar/TopBarMargin/AppBarHBox" unique_id=571527133]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_vertical = 4
@@ -223,7 +225,7 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-texture = ExtResource("6")
+texture = ExtResource("7")
 stretch_mode = 3
 
 [node name="SafeAreaMargin" type="MarginContainer" parent="." unique_id=4445250]
