@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://cp8j9k0lmn1op"]
+[gd_scene format=3 uid="uid://cp8kak0lmn1op"]
 
 [ext_resource type="Script" path="res://scripts/components/notification_card.gd" id="1"]
 

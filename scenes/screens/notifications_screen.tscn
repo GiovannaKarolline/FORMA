@@ -1,4 +1,4 @@
-[gd_scene load_steps=2 format=3 uid="uid://dq5j7h8k9lmno"]
+[gd_scene format=3 uid="uid://dq5j7h8lalmno"]
 
 [ext_resource type="Script" path="res://scripts/screens/notifications_screen.gd" id="1"]
 
