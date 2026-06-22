@@ -23,17 +23,17 @@ const BREAKPOINT_DESKTOP := 900
 func _ready() -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
-	resized.connect(_update_responsive_layout)
-	get_viewport().size_changed.connect(_update_responsive_layout)
+	get_tree().root.size_changed.connect(_update_responsive_layout)
+
 	back_button.pressed.connect(_go_to_selection)
 	new_portfolio_button.pressed.connect(_go_to_selection)
 	done_button.pressed.connect(_go_to_selection)
 
 	_populate(AppSession.latest_portfolio)
-	_update_responsive_layout.call_deferred()
 
-	# Ocultar scrollbars (padrão do projeto)
 	await get_tree().process_frame
+	await get_tree().process_frame
+	_update_responsive_layout()
 	_hide_scrollbar(main_scroll.get_v_scroll_bar())
 	_hide_scrollbar(main_scroll.get_h_scroll_bar())
 
@@ -42,14 +42,14 @@ func _hide_scrollbar(bar: ScrollBar) -> void:
 	bar.modulate            = Color(1.0, 1.0, 1.0, 0.0)
 	bar.mouse_filter        = Control.MOUSE_FILTER_IGNORE
 
-# ── Preenchimento com dados da API ─────────────────────────────────────────────
+# Preenchimento com dados da API
 
 func _populate(portfolio: Dictionary) -> void:
 	if portfolio.is_empty():
 		push_warning("[PortfolioResultScreen] AppSession.latest_portfolio está vazio.")
 		return
 
-	# ── Cabeçalho ──────────────────────────────────────────────────────────────
+	# Cabeçalho
 	var goal   := str(portfolio.get("optimizationGoal", ""))
 	var status := str(portfolio.get("status", ""))
 
@@ -58,7 +58,7 @@ func _populate(portfolio: Dictionary) -> void:
 	portfolio_name_label.text = str(portfolio.get("name", "Carteira"))
 	timestamp_label.text      = _format_dt(str(portfolio.get("optimizedAt", "")))
 
-	# ── Métricas (3 cards com acento colorido) ─────────────────────────────────
+	# Métricas
 	_add_metric(
 		"Retorno",
 		"%.1f%%" % _pct(portfolio, "expectedReturn"),
@@ -78,7 +78,7 @@ func _populate(portfolio: Dictionary) -> void:
 		FormaTokens.BLUE
 	)
 
-	# ── Alocação por ativo ─────────────────────────────────────────────────────
+	# Alocação por ativo
 	var assets: Array = portfolio.get("assets", [])
 	allocation_count_label.text = "%d ativos" % assets.size()
 	for asset: Dictionary in assets:
@@ -86,7 +86,7 @@ func _populate(portfolio: Dictionary) -> void:
 		allocation_list.add_child(row)
 		row.setup(asset)
 
-	# ── Nota de rodapé adaptada ao objetivo ────────────────────────────────────
+	# Nota de rodapé adaptada ao objetivo
 	goal_desc_label.text = _goal_description(goal)
 
 func _add_metric(p_label: String, p_value: String, p_sub: String, color: Color) -> void:
@@ -94,30 +94,30 @@ func _add_metric(p_label: String, p_value: String, p_sub: String, color: Color) 
 	metrics_grid.add_child(card)
 	card.setup(p_label, p_value, p_sub, color)
 
-# ── Navegação ──────────────────────────────────────────────────────────────────
+# Navegação
 
 func _go_to_selection() -> void:
 	SelectionManager.clear()
 	get_tree().change_scene_to_file("res://scenes/screens/wallet_selection_screen.tscn")
 
-# ── Responsividade ─────────────────────────────────────────────────────────────
+# Responsividade
 
 func _update_responsive_layout() -> void:
-	var w      := get_viewport().get_visible_rect().size.x
-	var margin := 20
+	var w := get_tree().root.size.x
+	if w <= 0:
+		return
 
+	var margin := 20
 	if w >= BREAKPOINT_DESKTOP:
 		margin = 64
 	elif w >= BREAKPOINT_TABLET:
 		margin = 32
 
-	# Métricas: 3 colunas sempre (cards compactos funcionam bem até 390px)
 	metrics_grid.columns = 3
-
 	safe_area_margin.add_theme_constant_override("margin_left",  margin)
 	safe_area_margin.add_theme_constant_override("margin_right", margin)
 
-# ── Helpers nula-seguro (mesmo padrão usado em asset_allocation_row.gd) ────────
+# Helpers nula-seguro (mesmo padrão usado em asset_allocation_row.gd)
 
 func _nf(d: Dictionary, key: String) -> float:
 	var v: Variant = d.get(key)
@@ -126,7 +126,7 @@ func _nf(d: Dictionary, key: String) -> float:
 func _pct(d: Dictionary, key: String) -> float:
 	return _nf(d, key) * 100.0
 
-# ── Formatação de textos ───────────────────────────────────────────────────────
+# Formatação de textos
 
 func _goal_display(goal: String) -> String:
 	match goal:

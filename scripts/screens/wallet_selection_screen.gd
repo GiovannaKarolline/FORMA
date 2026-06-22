@@ -38,23 +38,22 @@ func _ready() -> void:
 	_fill_amber = _make_fill(FormaTokens.AMBER)
 	_fill_green = _make_fill(FormaTokens.GREEN)
 
-	resized.connect(_update_responsive_layout)
-	get_viewport().size_changed.connect(_update_responsive_layout)
+	get_tree().root.size_changed.connect(_update_responsive_layout)
+
 	search_edit.text_changed.connect(_on_search_changed)
 	SelectionManager.selection_changed.connect(_on_selection_changed)
 	SelectionManager.selection_limit_reached.connect(_on_limit_reached)
 	clear_button.pressed.connect(SelectionManager.clear)
-
-	# "Continuar": cria e otimiza a carteira via API
 	continue_button.pressed.connect(_on_continue_pressed)
 
+	await _load_categories()
 	_load_suggested_portfolios()
-	await _load_categories()          # async — chama GET /api/assets
 
 	_on_selection_changed([], 0)
-	_update_responsive_layout.call_deferred()
 
 	await get_tree().process_frame
+	await get_tree().process_frame
+	_update_responsive_layout()
 	_hide_all_scrollbars()
 
 # Carregamento (async)
@@ -80,12 +79,40 @@ func _load_categories() -> void:
 	_set_loading(false)
 
 func _load_suggested_portfolios() -> void:
+	# Monta um Set de tickers disponíveis (API ou mock, o que estiver no cache)
+	var available: Dictionary = {}
+	for asset: Dictionary in WalletRepository.get_cached_assets():
+		available[str(asset.get("ticker", ""))] = true
+
 	for portfolio: Dictionary in WalletRepository.get_suggested_portfolios():
+		var raw_tickers: Array  = portfolio.get("tickers", [])
+
+		# Mantém apenas tickers que existem de fato na fonte de dados atual
+		var valid_tickers: Array = raw_tickers.filter(
+			func(t: String) -> bool: return available.has(t)
+		)
+
+		# Markowitz exige mínimo 2 ativos — chip inútil se não há quórum
+		if valid_tickers.size() < 2:
+			push_warning(
+				"[WalletRepository] Preset '%s' ignorado: apenas %d ticker(s) disponível(is) na API." \
+				% [portfolio.get("id", "?"), valid_tickers.size()]
+			)
+			continue
+
 		var chip: SuggestedPortfolioChip = SUGGESTED_CHIP_SCENE.instantiate()
 		suggested_row.add_child(chip)
-		chip.setup(portfolio)
-		var tickers: Array = portfolio.get("tickers", []).duplicate()
-		chip.applied.connect(func() -> void: SelectionManager.apply_preset(tickers))
+
+		# Passa ao chip a versão filtrada (sem tickers inexistentes na API)
+		var filtered := portfolio.duplicate()
+		filtered["tickers"] = valid_tickers
+		chip.setup(filtered)
+
+		# Captura local evita problema de closure-em-loop
+		var tickers_copy := valid_tickers.duplicate()
+		chip.applied.connect(
+			func() -> void: SelectionManager.apply_preset(tickers_copy)
+		)
 
 # Botão "Continuar"
 
@@ -256,15 +283,23 @@ func _on_limit_reached() -> void:
 	push_warning("Limite de 10 ativos atingido.")
 
 func _update_responsive_layout() -> void:
-	var w       := get_viewport().get_visible_rect().size.x
+	var w := get_tree().root.size.x
+	if w <= 0:
+		return
+
 	var columns := 1
 	var margin  := 20
+
 	if w >= BREAKPOINT_DESKTOP:
-		columns = 3; margin = 64
+		columns = 3
+		margin  = 64
 	elif w >= BREAKPOINT_TABLET:
-		columns = 2; margin = 32
+		columns = 2
+		margin  = 32
+
 	for section: CategorySection in _category_sections.values():
 		section.set_columns(columns)
+
 	safe_area_margin.add_theme_constant_override("margin_left",  margin)
 	safe_area_margin.add_theme_constant_override("margin_right", margin)
 	assets_list.queue_sort()

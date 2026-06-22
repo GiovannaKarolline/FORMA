@@ -89,3 +89,16 @@ func get_user_portfolios(user_id: int) -> Dictionary:
 
 func get_notifications(user_id: int) -> Dictionary:
 	return await _req(BASE_NOTIF + "/api/notifications/user/%d" % user_id)
+	
+	# Métodos de seed (usados por AppSession na inicialização)
+
+func create_asset(ticker: String, asset_name: String, sector: String) -> Dictionary:
+	var body := JSON.stringify({"ticker": ticker, "name": asset_name, "sector": sector})
+	return await _req(BASE_ASSET + "/api/assets", HTTPClient.METHOD_POST, body)
+
+func add_price_history(ticker: String, price: float, price_date: String) -> Dictionary:
+	var body := JSON.stringify({"price": price, "priceDate": price_date})
+	return await _req(
+		BASE_ASSET + "/api/assets/%s/prices" % ticker,
+		HTTPClient.METHOD_POST, body
+	)
