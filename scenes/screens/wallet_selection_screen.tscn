@@ -158,12 +158,7 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_12"]
-bg_color = Color(0.835, 0.831, 0.855, 1)
-corner_radius_top_left = 100
-corner_radius_top_right = 100
-corner_radius_bottom_right = 100
-corner_radius_bottom_left = 100
+
 
 [node name="WalletSelectionScreen" type="VBoxContainer" unique_id=86905245]
 anchors_preset = 15
@@ -354,9 +349,9 @@ theme_override_constants/separation = 0
 [node name="BottomMargin" type="MarginContainer" parent="BottomSelectionBar/BottomVBox" unique_id=1933956397]
 layout_mode = 2
 theme_override_constants/margin_left = 16
-theme_override_constants/margin_top = 12
+theme_override_constants/margin_top = 16
 theme_override_constants/margin_right = 16
-theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_bottom = 16
 
 [node name="BottomHBox" type="HBoxContainer" parent="BottomSelectionBar/BottomVBox/BottomMargin" unique_id=2038198687]
 layout_mode = 2
@@ -433,12 +428,3 @@ theme_override_styles/focus = SubResource("StyleBoxFlat_7")
 disabled = true
 text = "Continuar"
 
-[node name="HomeIndicator" type="CenterContainer" parent="BottomSelectionBar/BottomVBox" unique_id=1749055734]
-custom_minimum_size = Vector2(0, 24)
-layout_mode = 2
-size_flags_horizontal = 3
-
-[node name="HomeStrip" type="PanelContainer" parent="BottomSelectionBar/BottomVBox/HomeIndicator" unique_id=1289681422]
-custom_minimum_size = Vector2(120, 4)
-layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_12")
