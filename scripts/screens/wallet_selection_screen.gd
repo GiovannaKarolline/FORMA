@@ -20,6 +20,8 @@ var _category_sections: Dictionary = {}
 
 func _ready() -> void:
 	resized.connect(_update_responsive_layout)
+	get_viewport().size_changed.connect(_update_responsive_layout)  # ← linha nova
+
 	search_edit.text_changed.connect(_on_search_changed)
 	SelectionManager.selection_changed.connect(_on_selection_changed)
 	SelectionManager.selection_limit_reached.connect(_on_limit_reached)
@@ -27,7 +29,7 @@ func _ready() -> void:
 
 	_load_suggested_portfolios()
 	_load_categories()
-	_update_responsive_layout()
+	_update_responsive_layout.call_deferred()  # ← era _update_responsive_layout()
 	_on_selection_changed([], 0)
 
 func _load_categories() -> void:
@@ -81,11 +83,7 @@ func _on_limit_reached() -> void:
 	push_warning("Limite de 10 ativos atingido. Remova um para adicionar outro.")
 
 func _update_responsive_layout() -> void:
-	# Guard: size.x é 0 antes do primeiro frame
-	if size.x == 0.0:
-		return
-
-	var w       := size.x
+	var w := get_viewport().get_visible_rect().size.x  # ← sempre tem valor real
 	var columns := 1
 	var margin  := 16
 

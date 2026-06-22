@@ -23,6 +23,8 @@ WalletRepository="*uid://43aimqhyh4a4"
 
 [display]
 
+window/size/viewport_width=390
+window/size/viewport_height=844
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
@@ -38,3 +40,4 @@ theme/custom="uid://b1w6qva3lyi1s"
 
 rendering_device/driver.windows="d3d12"
 renderer/rendering_method="mobile"
+environment/defaults/default_clear_color=Color(0.972549, 0.9647059, 0.94509804, 1)
