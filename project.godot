@@ -11,8 +11,15 @@ config_version=5
 [application]
 
 config/name="MyCassidile"
+run/main_scene="res://scenes/screens/wallet_selection_screen.tscn"
 config/features=PackedStringArray("4.7", "Mobile")
 config/icon="res://icon.svg"
+
+[autoload]
+
+FormaTokens="*uid://cvvvql2niykwn"
+SelectionManager="*uid://ccgkkltduiuqj"
+WalletRepository="*uid://43aimqhyh4a4"
 
 [display]
 

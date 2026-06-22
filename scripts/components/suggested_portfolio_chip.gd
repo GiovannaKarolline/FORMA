@@ -1,11 +1,14 @@
 extends PanelContainer
 
+class_name SuggestedPortfolioChip
 
-# Called when the node enters the scene tree for the first time.
-func _ready() -> void:
-	pass # Replace with function body.
+signal applied
 
+@onready var name_label: Label = %PortfolioNameLabel
+@onready var desc_label: Label = %PortfolioDescriptionLabel
+@onready var apply_button: Button = %ApplyButton
 
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-func _process(delta: float) -> void:
-	pass
+func setup(portfolio: Dictionary) -> void:
+	name_label.text = portfolio["nome"]
+	desc_label.text = portfolio["descricao"]
+	apply_button.pressed.connect(func(): applied.emit())
