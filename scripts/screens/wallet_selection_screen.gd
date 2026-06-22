@@ -127,25 +127,31 @@ func _on_continue_pressed() -> void:
 	_show_optimization_result(opt_result.data)
 
 func _show_optimization_result(portfolio: Dictionary) -> void:
-	var assets: Array = portfolio.get("assets", [])
+	var portfolio_name:  String = str(portfolio.get("name", "Carteira"))
+	var expected_return: float  = _api_pct(portfolio, "expectedReturn")
+	var portfolio_risk:  float  = _api_pct(portfolio, "portfolioRisk")
+	var sharpe_ratio:    float  = _api_float(portfolio, "sharpeRatio")
+	var assets:          Array  = portfolio.get("assets", [])
+
 	var lines: Array[String] = []
-	lines.append("📊 %s" % portfolio.get("name", "Carteira"))
+	lines.append("📊 %s" % portfolio_name)
 	lines.append("")
-	lines.append("Retorno esperado: %.1f%% a.a." % (portfolio.get("expectedReturn", 0.0) * 100.0))
-	lines.append("Risco anual:      %.1f%%" % (portfolio.get("portfolioRisk", 0.0) * 100.0))
-	lines.append("Índice de Sharpe: %.3f" % portfolio.get("sharpeRatio", 0.0))
-	lines.append("")
-	lines.append("Alocação ótima (Markowitz):")
-	for asset: Dictionary in assets:
-		lines.append("  %-8s → %5.1f%%" % [
-			str(asset.get("ticker", "")),
-			float(asset.get("weight", 0.0)) * 100.0
-		])
+	lines.append("Retorno esperado : %.1f%% a.a." % expected_return)
+	lines.append("Risco anual      : %.1f%%" % portfolio_risk)
+	lines.append("Índice de Sharpe : %.3f" % sharpe_ratio)
+
+	if not assets.is_empty():
+		lines.append("")
+		lines.append("Alocação ótima (Markowitz):")
+		for asset: Dictionary in assets:
+			var ticker: String = str(asset.get("ticker", "—"))
+			var weight: float  = _api_float(asset, "weight") * 100.0
+			lines.append("  %-8s → %5.1f%%" % [ticker, weight])
 
 	var dialog := AcceptDialog.new()
-	dialog.title        = "✅ Carteira Otimizada"
-	dialog.dialog_text  = "\n".join(lines)
-	dialog.min_size     = Vector2(360, 0)
+	dialog.title       = "✅ Carteira Otimizada"
+	dialog.dialog_text = "\n".join(lines)
+	dialog.min_size    = Vector2(360, 0)
 	add_child(dialog)
 	dialog.popup_centered()
 	dialog.confirmed.connect(dialog.queue_free)
@@ -269,3 +275,14 @@ func _make_fill(color: Color) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = color
 	return s
+
+# Helpers de leitura segura de dados da API
+
+func _api_float(dict: Dictionary, key: String, default: float = 0.0) -> float:
+	var val: Variant = dict.get(key)
+	if val == null:
+		return default
+	return float(val)
+
+func _api_pct(dict: Dictionary, key: String) -> float:
+	return _api_float(dict, key) * 100.0

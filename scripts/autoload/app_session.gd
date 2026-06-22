@@ -1,7 +1,8 @@
 extends Node
 
-var user_id: int = 0
+var user_id:   int    = 0
 var user_name: String = ""
+var latest_portfolio: Dictionary = {}
 
 func _ready() -> void:
 	await get_tree().process_frame
