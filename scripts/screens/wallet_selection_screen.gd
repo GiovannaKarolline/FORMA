@@ -96,14 +96,12 @@ func _on_continue_pressed() -> void:
 
 	_set_continue_loading(true)
 
-	# 1. Criar carteira no Portfolio Service
 	var create_result := await WalletApiClient.create_portfolio(
 		AppSession.user_id,
 		"Carteira %s" % Time.get_datetime_string_from_system().left(10),
 		tickers,
 		"MAX_SHARPE"
 	)
-
 	if not create_result.ok or create_result.data == null:
 		_set_continue_loading(false)
 		_show_error("Não foi possível criar a carteira. Verifique a conexão.")
@@ -115,16 +113,16 @@ func _on_continue_pressed() -> void:
 		_show_error("ID de carteira inválido retornado pela API.")
 		return
 
-	# 2. Executar otimização de Markowitz
 	var opt_result := await WalletApiClient.optimize_portfolio(portfolio_id)
 	_set_continue_loading(false)
 
 	if not opt_result.ok or opt_result.data == null:
-		_show_error("Ativos sem histórico de preços suficiente para otimização.\n(mínimo 2 preços por ativo no asset-service)")
+		_show_error("Ativos sem histórico de preços suficiente.\n(mín. 2 preços por ativo no asset-service)")
 		return
 
-	# 3. Exibir resultado
-	_show_optimization_result(opt_result.data)
+	# Armazena resultado e navega para a tela de resultado
+	AppSession.latest_portfolio = opt_result.data
+	get_tree().change_scene_to_file("res://scenes/screens/portfolio_result_screen.tscn")
 
 func _show_optimization_result(portfolio: Dictionary) -> void:
 	var portfolio_name:  String = str(portfolio.get("name", "Carteira"))
